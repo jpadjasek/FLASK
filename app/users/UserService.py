@@ -2,7 +2,7 @@ import sqlalchemy
 from flask import jsonify, request, Response, Blueprint
 
 from app.models.Model import User, Skill
-from app.s3.s3Service import upload_file, get_presigned_url, delete_user_cv
+from app.s3.S3Service import upload_file, get_presigned_url, delete_user_cv
 
 user_blueprint = Blueprint('user_blueprint', __name__)
 

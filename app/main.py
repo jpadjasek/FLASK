@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from app.models.Model import model_db
-from app.s3.s3Service import s3_blueprint
+from app.s3.S3Service import s3_blueprint
 from app.skills.SkillsService import skill_blueprint
 from app.users.UserService import user_blueprint
 
