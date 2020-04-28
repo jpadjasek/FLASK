@@ -24,9 +24,10 @@ def upload():
 def list_files():
     s3 = boto3.client('s3')
     contents = []
-    for item in s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=DIR_PREFIX, StartAfter='cvs/')['Contents']:
-        contents.append(item['Key'])
-
+    obj_count = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=DIR_PREFIX, StartAfter='cvs/')['KeyCount']
+    if obj_count > 0:
+        for item in s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=DIR_PREFIX, StartAfter='cvs/')['Contents']:
+            contents.append(item['Key'])
     return contents
 
 
