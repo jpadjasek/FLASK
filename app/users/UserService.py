@@ -2,6 +2,7 @@ import sqlalchemy
 from flask import jsonify, request, Response, Blueprint
 
 from app.models.Model import User, Skill
+from app.s3.s3Service import upload_file, get_presigned_url, delete_user_cv
 
 user_blueprint = Blueprint('user_blueprint', __name__)
 
@@ -9,6 +10,9 @@ user_blueprint = Blueprint('user_blueprint', __name__)
 @user_blueprint.route('/user', methods=['GET'])
 def get_users():
     users = User.query.all()
+    for user in users:
+        if user.cv_name:
+            user.cv_url = get_presigned_url(user.id, user.cv_name)
     return jsonify(users)
 
 
@@ -17,7 +21,7 @@ def add_user():
     content = request.get_json()
     user = User(first_name=content['first_name'], last_name=content['last_name'])
     try:
-        User.add_user(user)
+        User.save_user(user)
         return jsonify(user)
     except sqlalchemy.exc.IntegrityError as e:
         return get_error_response(400, message='User already exists')
@@ -30,6 +34,7 @@ def delete_user_by_id(user_id):
     except UserNotFoundException:
         return Response(status=204, mimetype='application/json')
     User.delete_user(user)
+    delete_user_cv(user_id)
     return Response(status=204, mimetype='application/json')
 
 
@@ -48,6 +53,20 @@ def add_skill_to_user(user_id):
         return jsonify(skill)
     except sqlalchemy.exc.IntegrityError as e:
         return get_error_response(400, message='User already has this skill!')
+
+
+@user_blueprint.route("/user/<user_id>/cv", methods=['POST'])
+def upload_cv_for_user(user_id):
+    try:
+        user = get_user_by_id(user_id)
+    except UserNotFoundException:
+        return get_error_response(400, message='User not found')
+    file = request.files['file']
+    upload_file(user_id, file)
+    user.cv_name = file.filename
+    User.save_user(user)
+    user.cv_url = get_presigned_url(user.id, user.cv_name)
+    return jsonify(user)
 
 
 def get_user_by_id(user_id):

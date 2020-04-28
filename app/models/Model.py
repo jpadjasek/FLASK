@@ -37,12 +37,14 @@ class User(model_db.Model):
     first_name: str
     last_name: str
     cv_url: str
+    cv_name: str
     skills: Skill
 
     id = model_db.Column(model_db.Integer, primary_key=True)
     first_name = model_db.Column(model_db.String(20), unique=False, nullable=False)
     last_name = model_db.Column(model_db.String(120), unique=False, nullable=False)
     cv_url = model_db.Column(model_db.String(120), unique=True, nullable=True)
+    cv_name = model_db.Column(model_db.String(120), unique=False, nullable=True)
     skills = model_db.relationship('Skill', backref='user', cascade='all', lazy=True)
 
     __table_args__ = (
@@ -50,7 +52,7 @@ class User(model_db.Model):
     )
 
     @staticmethod
-    def add_user(user):
+    def save_user(user):
         model_db.session.add(user)
         model_db.session.commit()
         return user
