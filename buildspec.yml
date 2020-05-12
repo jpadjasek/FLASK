@@ -9,11 +9,16 @@ phases:
       - docker --version
   pre_build:
     commands:
-      - echo 'pre build'
-      - pip install -r requirements.txt
-
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
-      - echo build
-      - docker build -t app .
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t flask:latest .
 
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com/flask:latest
