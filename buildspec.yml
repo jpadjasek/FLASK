@@ -21,4 +21,5 @@ phases:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
+      - docker tag flask:latest 985920242639.dkr.ecr.eu-west-2.amazonaws.com/flask:latest
       - docker push 985920242639.dkr.ecr.eu-west-2.amazonaws.com/flask:latest
